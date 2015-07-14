@@ -25,6 +25,10 @@ check: environ
 			fi; \
 		done; \
 	fi; \
+	nolabels="$(shell python -c 'print(" ".join(set(r"$(shell grep -o '\\ref{[^}]*}' *.tex | sed -e 's/\\ref{//' -e 's/}//')".split()) - set(r"$(shell grep -o '\\label{[^}]*}' *.tex | sed -e 's/\\label{//' -e 's/}//')".split())))')"; \
+	if [ "$$nolabels" != "" ]; then \
+		echo "error: label used but not defined: $$nolabels"; flg=1; \
+	fi; \
 	dontuse="$(shell python -c 'print(" ".join(set("${PLOTS}".split(" ")) - set("${GRAPHICS}".split(" "))))')"; \
 	if [ "$$dontuse" != "" ]; then \
 		echo "warning: plot graph but don't use: $$dontuse"; \
