@@ -25,6 +25,9 @@ check: environ
 			fi; \
 		done; \
 	fi; \
+	if [ "$(shell python -c 'print(" ".join(set("${PLOTS}".split(" ")) - set("${GRAPHICS}".split(" "))))')" != "" ]; then \
+		echo "warning: plot graph but don't use: $(shell python -c 'print(" ".join(set("${PLOTS}".split(" ")) - set("${GRAPHICS}".split(" "))))')"; \
+	fi; \
 	if [ $$flg -ne 0 ]; then \
 		! : ; \
 	fi
