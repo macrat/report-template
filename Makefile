@@ -50,7 +50,7 @@ help:
 	@echo make clean : cleanup temporary files.
 	@echo make cleanall : cleanup all compiled file.
 	@echo make environ : show directory information.
-	@echo make check : check image files dependencies.
+	@echo make check : validate tex file.
 	@echo make help : show this.
 
 .PHONY: environ
