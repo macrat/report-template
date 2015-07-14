@@ -10,7 +10,24 @@ GRAPHICS = $(shell grep includegraphics *.tex | grep -o '{.*}' | sed -e 's/[{}]/
 DEPENDENCIES = $(shell python -c 'print(" ".join(set("${GRAPHICS}".split(" ")) - set("${PLOTS}".split(" "))))')
 
 .PHONY: all
-all: environ ${PDFS};
+all: environ check ${PDFS};
+
+.PHONY: check
+check: environ
+	@flg=0; \
+	if [ "`ls *.tex`" == "" ]; then \
+		echo 'error: tex file not found.' >&2; flg=1; \
+	fi; \
+	if [ "${DEPENDENCIES}" != "" ]; then \
+		for x in ${DEPENDENCIES}; do \
+			if [ ! -f $$x ]; then \
+				echo "error: no such image file: $$x" >&2; flg=1; \
+			fi; \
+		done; \
+	fi; \
+	if [ $$flg -ne 0 ]; then \
+		! : ; \
+	fi
 
 .PHONY: help
 help:
