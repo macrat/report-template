@@ -25,11 +25,13 @@ check: environ
 			fi; \
 		done; \
 	fi; \
-	if [ "$(shell python -c 'print(" ".join(set("${PLOTS}".split(" ")) - set("${GRAPHICS}".split(" "))))')" != "" ]; then \
-		echo "warning: plot graph but don't use: $(shell python -c 'print(" ".join(set("${PLOTS}".split(" ")) - set("${GRAPHICS}".split(" "))))')"; \
+	dontuse="$(shell python -c 'print(" ".join(set("${PLOTS}".split(" ")) - set("${GRAPHICS}".split(" "))))')"; \
+	if [ "$$dontuse" != "" ]; then \
+		echo "warning: plot graph but don't use: $$dontuse"; \
 	fi; \
-	if [ "`python -c 'ls=r"${GRAPHICS}".split(); print(" ".join(filter(lambda x:ls.count(x)>1, set(ls))))'`" != "" ]; then \
-		echo "warning: image file is many used:" `python -c 'ls=r"${GRAPHICS}".split(); print(" ".join(filter(lambda x:ls.count(x)>1, set(ls))))'`; \
+	manyuse="`python -c 'ls=r"${GRAPHICS}".split(); print(" ".join(filter(lambda x:ls.count(x)>1, set(ls))))'`"; \
+	if [ "$$manyuse" != "" ]; then \
+		echo "warning: image file is many used: $$manyuse"; \
 	fi; \
 	if [ $$flg -ne 0 ]; then \
 		! : ; \
