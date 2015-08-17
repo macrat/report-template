@@ -1,8 +1,12 @@
 TEX = platex
 DVIPDF = $(shell if type dvipdfmx 2>&1 >>/dev/null; then echo "dvipdfmx"; else echo "dvipdf"; fi)
 
-PDFS = $(shell ls *.tex 2>/dev/null | sed "s/.tex/.pdf/")
-DVIS = $(shell ls *.tex 2>/dev/null | sed "s/.tex/.dvi/")
+SOURCES = $(shell ls *.tex)
+CHILDREN = $(shell grep -o '\\\(input\|include\){.*\?}' *.tex | sed -e 's/.*\?{//' -e 's/}.*//' | sort -u | xargs -I{} echo {}.tex)
+BASES = $(shell python -c 'print(" ".join(set("${SOURCES}".split(" ")) - set("${CHILDREN}".split(" "))))')
+
+PDFS = $(shell echo ${BASES} | sed "s/.tex/.pdf/g")
+DVIS = $(shell echo ${BASES} | sed "s/.tex/.dvi/g")
 PLOTTERS = $(shell ls *.plt 2>/dev/null)
 
 PLOTS = $(shell grep output *.plt 2>/dev/null | grep -o '".*"' | sed -e 's/"//g')
@@ -28,6 +32,10 @@ check: environ
 	nolabels="$(shell python -c 'print(" ".join(set(r"$(shell grep -o '\\ref{[^}]*}' *.tex | sed -e 's/\\ref{//' -e 's/}//')".split()) - set(r"$(shell grep -o '\\label{[^}]*}' *.tex | sed -e 's/\\label{//' -e 's/}//')".split())))')"; \
 	if [ "$$nolabels" != "" ]; then \
 		echo "error: label used but not defined: $$nolabels"; flg=1; \
+	fi; \
+	notfounds="$(shell python -c 'print(" ".join(set("${CHILDREN}".split(" ")) - set("${SOURCES}".split(" "))))')"; \
+	if [ "$$notfounds" != "" ]; then \
+		echo "error: included tex not found: $$notfounds"; flg=1; \
 	fi; \
 	dontuse="$(shell python -c 'print(" ".join(set("${PLOTS}".split(" ")) - set("${GRAPHICS}".split(" "))))')"; \
 	if [ "$$dontuse" != "" ]; then \
@@ -58,6 +66,10 @@ environ:
 	@echo TEX: ${TEX}
 	@echo DVIPDF: ${DVIPDF}
 	@echo PLOTTERS: $(PLOTTERS)
+	@echo
+	@echo tex sources: ${SOURCES}
+	@echo base sources: ${BASES}
+	@echo included sources: ${CHILDREN}
 	@echo
 	@echo graph with gnuplot: ${PLOTS}
 	@echo dependency graphics: ${DEPENDENCIES}
