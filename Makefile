@@ -87,7 +87,7 @@ ${DVIS}: ${PLOTS} $(shell ls *.tex 2>/dev/null)
 	${TEX} $*
 
 ${PLOTS}: $(PLOTTERS)
-	gnuplot $(PLOTTERS)
+	for file in $(PLOTTERS); do gnuplot $${file}; done
 
 .PHONY: clean
 clean:
